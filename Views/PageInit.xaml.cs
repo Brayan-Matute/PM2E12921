@@ -59,6 +59,18 @@ namespace PM0220242P.Views
 
         private async void btnaceptar_Clicked(object sender, EventArgs e)
         {
+            if (string.IsNullOrWhiteSpace(Descripcion.Text))
+            {
+                await DisplayAlert("Error", "La descripción es obligatoria.", "OK");
+                return;
+            }
+
+            if (photo == null && _sitioExistente == null)
+            {
+                await DisplayAlert("Error", "La foto es obligatoria.", "OK");
+                return;
+            }
+
             double latitud = await ObtenerLatitudAsync();
             double longitud = await ObtenerLongitudAsync();
 
