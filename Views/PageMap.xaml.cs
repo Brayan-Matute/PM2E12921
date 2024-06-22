@@ -3,6 +3,8 @@ using Microsoft.Maui.Controls.Maps;
 using Microsoft.Maui.Maps;
 using System;
 using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace PM0220242P.Views
 {
@@ -30,8 +32,21 @@ namespace PM0220242P.Views
                 Location = new Location(latitude, longitude)
             };
 
+        
+            pin.MarkerClicked += OnPinClicked;
+
             map.Pins.Add(pin);
             map.MoveToRegion(MapSpan.FromCenterAndRadius(new Location(latitude, longitude), Distance.FromMiles(1)));
+        }
+
+        private async void OnPinClicked(object sender, PinClickedEventArgs e)
+        {
+            e.HideInfoWindow = true; 
+            var pin = sender as Pin;
+            if (pin != null)
+            {
+                await DisplayAlert("Pin Information", $"{pin.Label}\nLocation: {latitude}, {longitude}", "OK");
+            }
         }
 
         private async void ShareButton_Clicked(object sender, EventArgs e)
@@ -47,15 +62,12 @@ namespace PM0220242P.Views
                     var shareTitle = $"Foto de {description} en ({latitude}, {longitude})";
                     var shareMessage = $"Compartiendo foto de {description} en la ubicación ({latitude}, {longitude})";
 
-                    
                     await DisplayAlert("Compartir Foto", shareMessage, "OK");
 
-                    
                     await Share.RequestAsync(new ShareFileRequest
                     {
                         Title = shareTitle,
                         File = new ShareFile(imagePath),
-                       
                     });
                 }
                 else
@@ -68,12 +80,6 @@ namespace PM0220242P.Views
                 await DisplayAlert("Error", $"Error al compartir: {ex.Message}", "OK");
             }
         }
-
-
-
-
-
-
 
         private async Task<string> SaveImageAsync(ImageSource imageSource)
         {
@@ -107,9 +113,8 @@ namespace PM0220242P.Views
 
             return imageSource;
         }
- 
 
-private void NavigateButton_Clicked(object sender, EventArgs e)
+        private void NavigateButton_Clicked(object sender, EventArgs e)
         {
             var searchQuery = $"{latitude},{longitude}";
             var searchUrl = $"https://www.google.com/maps/search/?api=1&query={searchQuery}";
